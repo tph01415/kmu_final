@@ -1,8 +1,101 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
 
 #define TEXT_TYPE 1  //소개글 글자타입
 #define NUM_TYPE 2
+
+
+void print(FILE* fpr, FILE *fpw){ // user 함수 조금이라도 깨끗하게 보이기 위해 설정
+  int c;
+  while((c = fgetc(fpr)) != '/')
+    fprintf(fpw, "%c", c);
+}
+
+void hexToDeci(FILE* fpr, FILE* fpw, int n) // 16진수 > 10진수 변환
+{
+  char hex[16], hexCopy[16];
+  int i = 0, deci = 0, c, k;
+  int val, len;
+
+  switch (n)
+  {
+  case 1 : // 16진수가 / 앞까지 있는 경우
+    while((c = fgetc(fpr)) != '/'){
+      sprintf(hex, "%c", c); // int > string 바꿈
+      hexCopy[i] = *hex; // fgetc는 한 글자씩만 읽기에 hexCopy[i] 저장
+      i++;
+    }
+    break;
+  
+  case 2 : // 16진수가 = 앞까지 있는 경우
+    while((c = fgetc(fpr)) != '='){
+      sprintf(hex, "%c", c);
+      hexCopy[i] = *hex;
+      i++;
+    }
+    break;
+  }
+
+  char finalHex[i]; // hexCopy을 쓰면 오류나서 새로 설정
+
+  for(int j = 0; j < i; j++)
+    finalHex[j] = hexCopy[j];
+
+  len = strlen(finalHex);
+  len--;
+
+  for(k = 0; finalHex[k] != '0'; k++){
+    if(finalHex[k] > '0' && finalHex[k] <= '9'){
+      val = finalHex[k] -48;
+    }
+    else if(finalHex[k] >= 'a' && finalHex[k] <= 'f'){
+      val = finalHex[k] - 97 + 10;
+    }
+    else if(finalHex[k]>='A' && finalHex[k]<='F'){
+      val = finalHex[k] - 65 + 10;
+    }
+
+    deci += val * pow(16, len);
+    len--;
+  }
+  fprintf(fpw, "%d", deci);
+}
+
+
+void user(FILE *fpr, FILE *fpw)
+{
+  int c, n;
+  fprintf(fpw, "*USER STATUS*\n");
+
+  fprintf(fpw, "ID: ");
+  print(fpr, fpw);  // 단순 입력은 print 사용
+  
+  fprintf(fpw, "\nNAME: "); 
+  print(fpr, fpw);
+
+  fprintf(fpw, "\nGENDER: ");
+  while((c = fgetc(fpr)) != '/'){
+    if(c == 'F') 
+      fprintf(fpw, "FEMALE");
+    else fprintf(fpw, "MALE"); // F가 아닐 경우도 설정
+  }
+
+  fprintf(fpw, "\nAGE: ");
+  print(fpr, fpw);
+
+  char same[] = {'/'};
+  fprintf(fpw, "\nHP: ");
+  hexToDeci(fpr, fpw, 1); // 1은 '/'로 끝날 경우
+  
+  fprintf(fpw, "\nMP: ");
+  hexToDeci(fpr, fpw, 1);
+
+  fprintf(fpw, "\nCOIN: ");
+  hexToDeci(fpr, fpw, 2); // 2는 '='로 끝날 경우
+}
+
 
 FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 {
@@ -90,9 +183,11 @@ int main(int argc, char* argv[])
 	}
 	FILE* fpr = fopen(argv[1],"r+");  //인코딩 후 데이터 파일
 	FILE* fpw = fopen(argv[2],"w+");  //디코딩 후 데이터 파일
+
+
+	user(fpr, fpw);
 /*
-	user();
-	items();
+  items();
 	friend();*/
 	description(fpr,fpw);
 
