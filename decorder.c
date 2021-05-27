@@ -15,7 +15,7 @@ void print(FILE* fpr, FILE *fpw){ // user 함수 조금이라도 깨끗하게 �
 
 void hexToDeci(FILE* fpr, FILE* fpw, int n) // 16진수 > 10진수 변환
 {
-  char hex[16], hexCopy[16];
+  char hex[16];
   int i = 0, deci = 0, c, k;
   int val, len;
 
@@ -23,42 +23,31 @@ void hexToDeci(FILE* fpr, FILE* fpw, int n) // 16진수 > 10진수 변환
   {
   case 1 : // 16진수가 / 앞까지 있는 경우
     while((c = fgetc(fpr)) != '/'){
-      sprintf(hex, "%c", c); // int > string 바꿈
-      hexCopy[i] = *hex; // fgetc는 한 글자씩만 읽기에 hexCopy[i] 저장
-      i++;
+      hex[i++] = c;
     }
     break;
   
   case 2 : // 16진수가 = 앞까지 있는 경우
     while((c = fgetc(fpr)) != '='){
-      sprintf(hex, "%c", c);
-      hexCopy[i] = *hex;
-      i++;
+      hex[i++] = c;
     }
+		hex[i] = '\0';
     break;
   }
 
-  char finalHex[i]; // hexCopy을 쓰면 오류나서 새로 설정
-
-  for(int j = 0; j < i; j++)
-    finalHex[j] = hexCopy[j];
-
-  len = strlen(finalHex);
-  len--;
-
-  for(k = 0; finalHex[k] != '0'; k++){
-    if(finalHex[k] > '0' && finalHex[k] <= '9'){
-      val = finalHex[k] -48;
+  for(k = 0; hex[k] != '\0'; k++){
+    if(hex[k] > '0' && hex[k] <= '9'){
+      val = hex[k] -48;
     }
-    else if(finalHex[k] >= 'a' && finalHex[k] <= 'f'){
-      val = finalHex[k] - 97 + 10;
+    else if(hex[k] >= 'a' && hex[k] <= 'f'){
+      val = hex[k] - 97 + 10;
     }
-    else if(finalHex[k]>='A' && finalHex[k]<='F'){
-      val = finalHex[k] - 65 + 10;
+    else if(hex[k]>='A' && hex[k]<='F'){
+      val = hex[k] - 65 + 10;
     }
 
-    deci += val * pow(16, len);
-    len--;
+    deci += val * pow(16, i-1);
+    i--;
   }
   fprintf(fpw, "%d", deci);
 }
@@ -189,7 +178,7 @@ int main(int argc, char* argv[])
 /*
   items();
 	friend();*/
-	description(fpr,fpw);
+//	description(fpr,fpw);
 
 	fclose(fpr);
 	fclose(fpw);
