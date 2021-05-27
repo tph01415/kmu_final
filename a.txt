@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-098
-=======
+KUM_CS23/HONG CHAN PARK/F/33/C8/5/A8CA=
 A10B2CD
 ABCD4!@3
 ABCDE
->>>>>>> 9196333... ADD description(), EDIT main -Henry-Cha-

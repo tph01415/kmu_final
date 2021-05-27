@@ -88,7 +88,7 @@ void user(FILE *fpr, FILE *fpw)
 
 FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 {
-	fprintf(fpw,"*DESCRIPTION*\n");
+	fprintf(fpw,"\n*DESCRIPTION*\n");
 	char tmp;
 	char c;
 	int a;
@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
 /*
   items();
 	friend();*/
-//	description(fpr,fpw);
+	description(fpr,fpw);
 
 	fclose(fpr);
 	fclose(fpw);
