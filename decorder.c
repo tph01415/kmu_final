@@ -83,6 +83,13 @@ void user(FILE *fpr, FILE *fpw)
 
   fprintf(fpw, "\nCOIN: ");
   hexToDeci(fpr, fpw, 2); // 2는 '='로 끝날 경우
+
+	// 신뢰성 처리해야할 곳
+
+	while((c = fgetc(fpr)) == '\n'){
+		break;
+	}
+
 }
 
 
