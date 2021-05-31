@@ -3,6 +3,14 @@
 #include <string.h>
 #include <ctype.h>
 
+/*----------------
+
+
+
+
+----------------*/
+
+
 #define TRUE 1
 #define FALSE 0
 #define MAX_ID_SIZE 255
@@ -12,7 +20,6 @@
 void trans(FILE * fp1, FILE * fp2);
 
 int debug = 1;
-int check = 0;
 char hexstr[255];
 char desc_str[MAX_BUF_SIZE];
 
@@ -39,14 +46,11 @@ int main(int argc, char * argv[])
 
 
 char * change_hex(char * str){
-
     int value = atoi(str);
     
     sprintf(hexstr,"%x",value);
-    if(check == 1) strcat(hexstr,"/");
 
-    check = 0;
-    return hexstr;
+	return hexstr;
 }
 
 
@@ -115,22 +119,19 @@ void trans(FILE * fp1, FILE * fp2)
             buf[strlen(buf) - 1] = '\0';
             while (1) {           
                 bufptr = strtok(buf, ":");
-                if (strcmp(bufptr,"HP") == 0 || strcmp(bufptr,"MP") == 0) check = 1; 
-                if(strcmp(bufptr,"COIN") == 0) check = 2;
                 bufptr = strtok(NULL, "\n");
                 for (i = 0 ; i < strlen(bufptr) ; i ++) bufptr[i] = bufptr[i + 1];
                 fgets(tmp, MAX_BUF_SIZE, fp1);
                 if (tmp[0] != '\n') tmp[strlen(tmp) - 1] = '\0';
                 if (tmp[0] == '\n') {
-                    fprintf(fp2,"%s", change_hex(bufptr));
-                    fprintf(fp2, "\n");
+                    fprintf(fp2,"%s\n", change_hex(bufptr));
                     break;
                 } else {
                     if (strcmp(bufptr, "FEMALE") == 0) fprintf(fp2, "F/");
                     else if (strcmp(bufptr, "MALE") == 0) fprintf(fp2, "M/");
 
                     else if (check == 1) { 
-                       fprintf(fp2,"%s", change_hex(bufptr)); 
+                       fprintf(fp2,"%s/", change_hex(bufptr)); 
                     }
                     else fprintf(fp2, "%s/", bufptr);
                     strcpy(buf, tmp);
@@ -146,10 +147,11 @@ void trans(FILE * fp1, FILE * fp2)
                 fgets(tmp, MAX_BUF_SIZE, fp1);
                 if (tmp[0] != '\n') tmp[strlen(tmp) - 1] = '\0';
                 if (tmp[0] == '\n') {
-                    fprintf(fp2, "%s\n", bufptr);
+                    fprintf(fp2, "%s\n", change_hex(bufptr));
                     break;
                 } else {
-                    fprintf(fp2, "%s/", bufptr);
+					check = 1;
+                    fprintf(fp2, "%s/", change_hex(bufptr));
                     strcpy(buf, tmp);
                 }
             }
