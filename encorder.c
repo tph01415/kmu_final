@@ -20,6 +20,7 @@
 void trans(FILE * fp1, FILE * fp2);
 
 int debug = 1;
+int check = 0;
 char hexstr[255];
 char desc_str[MAX_BUF_SIZE];
 
@@ -49,7 +50,8 @@ char * change_hex(char * str){
     int value = atoi(str);
     
     sprintf(hexstr,"%x",value);
-
+	
+	check =0;
 	return hexstr;
 }
 
@@ -119,6 +121,7 @@ void trans(FILE * fp1, FILE * fp2)
             buf[strlen(buf) - 1] = '\0';
             while (1) {           
                 bufptr = strtok(buf, ":");
+				if (strcmp(bufptr,"HP") == 0 || strcmp(bufptr,"MP") == 0) check = 1;
                 bufptr = strtok(NULL, "\n");
                 for (i = 0 ; i < strlen(bufptr) ; i ++) bufptr[i] = bufptr[i + 1];
                 fgets(tmp, MAX_BUF_SIZE, fp1);
