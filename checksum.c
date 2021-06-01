@@ -2,23 +2,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SIZE_OF_ROW 50
-#define SIZE_OF_COL 100
+#define SIZE_OF_ROW 50 //row크기
+#define SIZE_OF_COL 100 //col크기
 
 int main()
 {
-    char input_data[SIZE_OF_COL+2][SIZE_OF_ROW+2] = {0}; //insert checksum at the end of row
-    FILE *input_fptr;
-    int rCount;
-    int NoRow;
+	
+    char input_data[SIZE_OF_COL+2][SIZE_OF_ROW+2] = {0}; //데이터가 들어가는 2차원 배열
+    FILE *input_fptr; //파일 포인터
+    int rCount; //카운터
+    int NoRow;//number of row
     int i,j;
-    unsigned short  int RowCS, xRowCS;
-    unsigned short  int ColCS[SIZE_OF_ROW+2] = {0};
-    unsigned short  int xColCS[SIZE_OF_ROW+2] = {0};
-    typedef struct error_loc {
+    unsigned short  int RowCS, xRowCS; //...checksum 값을 빼내서 비교하는 배열
+    unsigned short  int ColCS[SIZE_OF_ROW+2] = {0}; //배열 초기화(전체 배열의 크기는 checksum값이 들어가는 칸(+2)
+    unsigned short  int xColCS[SIZE_OF_ROW+2] = {0}; // 동일
+    typedef struct error_loc { //에러 위치와 에러 차이가 들어가는 구조체
             int row, col; int diff;
             } Error_Loc ;
-    Error_Loc  Detected_Errors[4] = {{0,0,0}};
+    Error_Loc  Detected_Errors[4] = {{0,0,0}}; //초기화 최대 에러는 4개까지
     int NoOfError= 0;
 
     input_fptr = fopen("input.txt","rb");
@@ -26,11 +27,14 @@ int main()
 
     for (NoRow = 0 ; (rCount = fread(input_data[NoRow], sizeof(char), SIZE_OF_ROW, input_fptr)) != 0 ; NoRow++) {
             input_data[NoRow][rCount] = '\0';
+			//데이터를 2차원 배열에 넣고 체크섬 값이 들어갈 부분에는 NULL\0값을 넣어준다.
+		
             // printf("[%d,%d]\n%s\n",NoRow, rCount,input_data[NoRow]);
     }
 
     for( j = 0 ; j <= SIZE_OF_ROW+1 ; j++ )
-            ColSC[j] = 0;
+            ColCS[j] = 0;
+			//2중 for문을 이용해서 체크섬 값을 계산 및 입력
 
     for( i = 0 ; i < NoRow ; i++ ) {
             input_data[i][SIZE_OF_ROW] = 0 ;
@@ -46,6 +50,10 @@ int main()
                     */
                     RowCS += (unsigned short) input_data[i][j];
                     ColCS[j] += (unsigned short) input_data[i][j];
+
+					//각 칸 마다 마지막 row와 col에+=해서 아스키 값을 더해주면서 입력한다
+
+
                     /*
                     if( i == 2 && j == 6 )
                             printf("\nBF [2,6] \"%c %u\" RC = %u, CS = %u\n", input_data[2][6],
@@ -56,12 +64,19 @@ int main()
             }
             input_data[i][SIZE_OF_ROW] = (unsigned char)(0xFF & RowCS);
             input_data[i][SIZE_OF_ROW+1] = (unsigned char)(0xFF & (RowCS >> 8));
+			
+			//값을 1바이트 1바이트로 나눠서 0xFF 0xFF 저장(오버플로우 방지)
+
+
             // printf("(%u, %02u)",i,RowCS);
     }
 
     for( i = 0 ; i < NoRow ; i++ ) {
             for(j = SIZE_OF_ROW; j <= SIZE_OF_ROW+1  ; j++ ) {
-                    ColsSC[j] != (unsigned short) input_data[i][j];
+                    ColCS[j] != (unsigned short) input_data[i][j];
+			
+
+
             }
     }
 
