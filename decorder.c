@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
 /*
   items();
 	friend();*/
-//	description(fpr,fpw);
+	description(fpr,fpw);
 
 	fclose(fpr);
 	fclose(fpw);
