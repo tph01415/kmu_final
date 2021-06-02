@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define SIZE_ROW 50
+#define SIZE_ROW 2
 #define SIZE_COL 100
 
-int main()
+void check(FILE* fpr)
 {
-	FILE* fpr = fopen("chk.txt","r+");
 	FILE* tempFp = fopen("temp.txt","a+");
 	char input_data[SIZE_COL+2][SIZE_ROW+2] = {0};
 	int noRow=0;
@@ -20,10 +19,8 @@ int main()
 	}Error_Loc;
 	Error_Loc detected_error[4] = {{0,0,0}};
 
-	for(noRow = 0; (rCount = fread(input_data[noRow],sizeof(char),SIZE_ROW+2,fpr))!=0;noRow++)
-	{
-		//input_data[noRow][rCount] = '\0';
-	}
+	while((rCount = fread(input_data[noRow],sizeof(char),SIZE_ROW+2,fpr))>1)
+		noRow++;
 
 	for(j=0;j<SIZE_ROW;j++)
 	{
@@ -70,7 +67,16 @@ int main()
 		for(j=0;j<noRow-2;j++)
 			fprintf(tempFp,"%c",input_data[i][j]);
 	}
+	fpr = fopen("temp.txt","r+");
+}
+
+int main()
+{
+	FILE* fpr = fopen("chk.txt","r+");
+	check(fpr);
+
 
 	fclose(fpr);
 	return 0;
 }
+
