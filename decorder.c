@@ -33,6 +33,15 @@ void hexToDeci(FILE* fpr, FILE* fpw, int n) // 16진수 > 10진수 변환
     }
 		hex[i] = '\0';
     break;
+		  
+	case 3:
+		  while(1) {
+			  c = fgetc(fpr);
+			  if(c == '/'||c == '\n')
+				  break;
+			  else
+				  hex[i++] = c;
+                }
   }
 
   for(k = 0; hex[k] != '\0'; k++){
