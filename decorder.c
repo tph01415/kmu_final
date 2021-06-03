@@ -92,6 +92,51 @@ void user(FILE *fpr, FILE *fpw)
 
 }
 
+void items(FILE* fpr, FILE* fpw)
+{
+        char c;
+        fprintf(fpw, "\n*ITEMS*");
+        while(1)
+        {
+                c = fgetc(fpr);
+                if(c == 'A')
+                {
+                        fprintf(fpw, "\nBOMB: ");
+                        hexToDeci(fpr, fpw, 3);
+                }
+                else if(c == 'B')
+                {
+                        fprintf(fpw, "\nPOTION: ");
+                        hexToDeci(fpr, fpw, 3);
+                }
+                else if(c == 'C')
+                {
+                        fprintf(fpw, "\nCURE: ");
+                        hexToDeci(fpr, fpw, 3);
+                }
+                else if(c == 'D')
+                {
+                        fprintf(fpw, "\nBOOK: ");
+                        hexToDeci(fpr, fpw, 3);
+                }
+                else if(c == 'E')
+                {
+                        fprintf(fpw, "\nSHIELD: ");
+                        hexToDeci(fpr, fpw, 3);
+                }
+                else if(c == 'F')
+                {
+                        fprintf(fpw, "\nCANNON: ");
+                        hexToDeci(fpr, fpw, 3);
+                }
+                else
+                {
+                        break;
+                }
+
+        }
+}
+
 
 FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 {
