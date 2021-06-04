@@ -5,6 +5,7 @@
 
 #define TEXT_TYPE 1  //소개글 글자타입
 #define NUM_TYPE 2
+char eofItem = 0;
 
 
 void print(FILE* fpr, FILE *fpw){ // user 함수 조금이라도 깨끗하게 보이기 위해 설정
@@ -15,60 +16,74 @@ void print(FILE* fpr, FILE *fpw){ // user 함수 조금이라도 깨끗하게 �
 
 void hexToDeci(FILE* fpr, FILE* fpw) // 16진수 > 10진수 변환
 {
-        char hex[16];
-        int i = 0, deci = 0, c, k;
-        int val, len;
+	char hex[16];
+	int i = 0, deci = 0, c, k;
+	int val, len;
 
-        while(1) {
-                c = fgetc(fpr);
-                if(c == '/'||c == '\n')
-                        break;
-                else
-                        hex[i++] = c;
+	while(1) {
+		c = fgetc(fpr);
+		if(c == '/')
+			break;
+		else if(c=='\n')
+		{
+			eofItem = 1;
+			break;
+		}
+		else
+			hex[i++] = c;
 
-                }
+	}
 
 
-  for(k = 0; hex[k] != '\0'; k++){
-    if(hex[k] > '0' && hex[k] <= '9'){
-      val = hex[k] -48;
-    }
-    else if(hex[k] >= 'a' && hex[k] <= 'f'){
-      val = hex[k] - 97 + 10;
-    }
-    else if(hex[k]>='A' && hex[k]<='F'){
-      val = hex[k] - 65 + 10;
-    }
+	for(k = 0; hex[k] != '\0'; k++){
+		if(hex[k] > '0' && hex[k] <= '9'){
+			val = hex[k] -48;
+		}
+		else if(hex[k] >= 'a' && hex[k] <= 'f'){
+			val = hex[k] - 97 + 10;
+		}
+		else if(hex[k]>='A' && hex[k]<='F'){
+			val = hex[k] - 65 + 10;
+		}
 
-    deci += val * pow(16, i-1);
-    i--;
-  }
-  fprintf(fpw, "%d", deci);
+		deci += val * pow(16, i-1);
+		i--;
+	}
+	fprintf(fpw, "%d", deci);
 }
 
 void friend(FILE* fpr, FILE* fpw)
 {
-        char c;
-        int i = 1;
-        fprintf(fpw, "\n*FRIENDS LIST*");
-        while((c=fgetc(fpr))!='\n')
-        {
-                        fprintf(fpw, "\nFRIEND%d ID: ", i);
-                        print(fpr, fpw);
-                        fprintf(fpw, "\nFRINED%d NAME: ", i);
-                        print(fpr, fpw);
-                        fprintf(fpw, "\nFRIEND%d GENDER: ", i);
-                        print(fpr, fpw);
-                        fprintf(fpw, "\nFRINED%d AGE: ", i);
-                        while((c=fgetc(fpr))!='|' || (c=fgetc(fpr))!='=')
-			{
-				fprintf(fpw, "%c", c);
-			}
-		fprintf(fpw, "\n\n");
-                i++;
-        }
+	char c;
+	int i = 1;
+	fprintf(fpw, "\n\n*FRIENDS LIST*");
+	while(1)
+	{
+		fprintf(fpw, "\nFRIEND%d ID: ", i);
+		print(fpr, fpw);
+		fprintf(fpw, "\nFRINED%d NAME: ", i);
+		print(fpr, fpw);
+		fprintf(fpw, "\nFRIEND%d GENDER: ", i);
+		while((c = fgetc(fpr)) != '/'){
+			if(c == 'F') 
+				fprintf(fpw, "FEMALE");
+			else fprintf(fpw, "MALE"); // F가 아닐 경우도 설정
+		}
+		//                       print(fpr, fpw);
+		fprintf(fpw, "\nFRINED%d AGE: ", i);
+		while(1)
+		{
+			c=fgetc(fpr);
+			if(c=='|' || c=='\n')
+				break;
+			fprintf(fpw, "%c", c);
+		}
+		fprintf(fpw, "\n");
+		i++;
+		if(c=='\n')
+			break;
+	}
 }
-
 
 void user(FILE *fpr, FILE *fpw)
 {
@@ -93,65 +108,63 @@ void user(FILE *fpr, FILE *fpw)
 
   char same[] = {'/'};
   fprintf(fpw, "\nHP: ");
-  hexToDeci(fpr, fpw, 1); // 1은 '/'로 끝날 경우
+  hexToDeci(fpr, fpw);
   
   fprintf(fpw, "\nMP: ");
-  hexToDeci(fpr, fpw, 1);
+  hexToDeci(fpr, fpw);
 
   fprintf(fpw, "\nCOIN: ");
-  hexToDeci(fpr, fpw, 2); // 2는 '='로 끝날 경우
-
-	// 신뢰성 처리해야할 곳
-
-	while((c = fgetc(fpr)) == '\n'){
-		break;
-	}
+  hexToDeci(fpr, fpw);
 
 }
 
 void items(FILE* fpr, FILE* fpw)
 {
-        char c;
-        fprintf(fpw, "\n*ITEMS*");
-        while(1)
-        {
-                c = fgetc(fpr);
-                if(c == 'A')
-                {
-                        fprintf(fpw, "\nBOMB: ");
-                        hexToDeci(fpr, fpw);
-                }
-                else if(c == 'B')
-                {
-                        fprintf(fpw, "\nPOTION: ");
-                        hexToDeci(fpr, fpw);
-                }
-                else if(c == 'C')
-                {
-                        fprintf(fpw, "\nCURE: ");
-                        hexToDeci(fpr, fpw);
-                }
-                else if(c == 'D')
-                {
-                        fprintf(fpw, "\nBOOK: ");
-                        hexToDeci(fpr, fpw);
-                }
-                else if(c == 'E')
-                {
-                        fprintf(fpw, "\nSHIELD: ");
-                        hexToDeci(fpr, fpw);
-                }
-                else if(c == 'F')
-                {
-                        fprintf(fpw, "\nCANNON: ");
-                        hexToDeci(fpr, fpw);
-                }
-                else
-                {
-                        break;
-                }
+	eofItem =0;
+	char c;
+	fprintf(fpw, "\n\n*ITEMS*");
+	while(1)
+	{
+		if(eofItem ==1)
+			break;
 
-        }
+		c = fgetc(fpr);
+		if(c == 'A')
+		{
+			fprintf(fpw, "\nBOMB: ");
+			hexToDeci(fpr, fpw);
+		}
+		else if(c == 'B')
+		{
+			fprintf(fpw, "\nPOTION: ");
+			hexToDeci(fpr, fpw);
+		}
+		else if(c == 'C')
+		{
+			fprintf(fpw, "\nCURE: ");
+			hexToDeci(fpr, fpw);
+		}
+		else if(c == 'D')
+		{
+			fprintf(fpw, "\nBOOK: ");
+			hexToDeci(fpr, fpw);
+		}
+		else if(c == 'E')
+		{
+			fprintf(fpw, "\nSHIELD: ");
+			hexToDeci(fpr, fpw);
+		}
+		else if(c == 'F')
+		{
+			fprintf(fpw, "\nCANNON: ");
+			hexToDeci(fpr, fpw);
+		}
+		else
+		{
+			break;
+		}
+
+	}
 }
 
 
@@ -244,8 +257,7 @@ int main(int argc, char* argv[])
 
 
 	user(fpr, fpw);
-/*
-  items();*/
+  items(fpr,fpw);
 	friend(fpr, fpw);
 	description(fpr,fpw);
 
