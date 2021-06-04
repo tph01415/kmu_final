@@ -54,7 +54,7 @@ FILE* check(FILE* fpr)
 
 	for(j=0;j<SIZE_ROW;j++){
 		if(xColCS[j] != colCS[j]){
-			for(i=0;i<numError;i++){
+			for(i=j;i<numError;i++){
 				if(detected_error[i].diff == (xColCS[j] - colCS[j])){
 					detected_error[i].col = j;
 					break;
