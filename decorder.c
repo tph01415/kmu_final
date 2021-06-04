@@ -60,7 +60,7 @@ void friend(FILE* fpr, FILE* fpw)
                         fprintf(fpw, "\nFRIEND%d GENDER: ", i);
                         print(fpr, fpw);
                         fprintf(fpw, "\nFRINED%d AGE: ", i);
-                        while((c=fgetc(fpr))!='|' )c=fgetc(fpr))!='=')
+                        while((c=fgetc(fpr))!='|' || (c=fgetc(fpr))!='=')
 			{
 				fprintf(fpw, "%c", c);
 			}
