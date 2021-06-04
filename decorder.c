@@ -49,9 +49,7 @@ void hexToDeci(FILE* fpr, FILE* fpw) // 16진수 > 10진수 변환
 void friend(FILE* fpr, FILE* fpw)
 {
         char c;
-	char check[4];
         int i = 1;
-	int n = 0;
         fprintf(fpw, "\n*FRIENDS LIST*");
         while((c=fgetc(fpr))!='\n')
         {
@@ -67,16 +65,6 @@ void friend(FILE* fpr, FILE* fpw)
 				fprintf(fpw, "%c", c);
 			}
 		fprintf(fpw, "\n\n");
-		if(c == '=')
-		{		
-			while((c=getc(fpr))!='\n')
-			{
-				check[n] = c;
-				n++;
-			}
-			check[n] = '\0';
-			break;
-		}
                 i++;
         }
 }
