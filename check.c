@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define SIZE_ROW 2
+#define SIZE_ROW 3
 #define SIZE_COL 100
 
 void check(FILE* fpr)
@@ -48,7 +48,7 @@ void check(FILE* fpr)
 	
 	for(j=0;j<SIZE_ROW;j++){
 		if(xColCS[j] != colCS[j]){
-			for(i=0;i<numError;i++){
+			for(i=j;i<numError;i++){
 				if(detected_error[i].diff == (xColCS[j] - colCS[j])){
 					detected_error[i].col = j;
 					break;
@@ -72,7 +72,7 @@ void check(FILE* fpr)
 
 int main()
 {
-	FILE* fpr = fopen("chk.txt","r+");
+	FILE* fpr = fopen("c.txt","r+");
 	check(fpr);
 
 
