@@ -13,36 +13,21 @@ void print(FILE* fpr, FILE *fpw){ // user 함수 조금이라도 깨끗하게 �
     fprintf(fpw, "%c", c);
 }
 
-void hexToDeci(FILE* fpr, FILE* fpw, int n) // 16진수 > 10진수 변환
+void hexToDeci(FILE* fpr, FILE* fpw) // 16진수 > 10진수 변환
 {
-  char hex[16];
-  int i = 0, deci = 0, c, k;
-  int val, len;
+        char hex[16];
+        int i = 0, deci = 0, c, k;
+        int val, len;
 
-  switch (n)
-  {
-  case 1 : // 16진수가 / 앞까지 있는 경우
-    while((c = fgetc(fpr)) != '/'){
-      hex[i++] = c;
-    }
-    break;
-  
-  case 2 : // 16진수가 = 앞까지 있는 경우
-    while((c = fgetc(fpr)) != '='){
-      hex[i++] = c;
-    }
-		hex[i] = '\0';
-    break;
-		  
-	case 3:
-		  while(1) {
-			  c = fgetc(fpr);
-			  if(c == '/'||c == '\n')
-				  break;
-			  else
-				  hex[i++] = c;
+        while(1) {
+                c = fgetc(fpr);
+                if(c == '/'||c == '\n')
+                        break;
+                else
+                        hex[i++] = c;
+
                 }
-  }
+
 
   for(k = 0; hex[k] != '\0'; k++){
     if(hex[k] > '0' && hex[k] <= '9'){
@@ -146,32 +131,32 @@ void items(FILE* fpr, FILE* fpw)
                 if(c == 'A')
                 {
                         fprintf(fpw, "\nBOMB: ");
-                        hexToDeci(fpr, fpw, 3);
+                        hexToDeci(fpr, fpw);
                 }
                 else if(c == 'B')
                 {
                         fprintf(fpw, "\nPOTION: ");
-                        hexToDeci(fpr, fpw, 3);
+                        hexToDeci(fpr, fpw);
                 }
                 else if(c == 'C')
                 {
                         fprintf(fpw, "\nCURE: ");
-                        hexToDeci(fpr, fpw, 3);
+                        hexToDeci(fpr, fpw);
                 }
                 else if(c == 'D')
                 {
                         fprintf(fpw, "\nBOOK: ");
-                        hexToDeci(fpr, fpw, 3);
+                        hexToDeci(fpr, fpw);
                 }
                 else if(c == 'E')
                 {
                         fprintf(fpw, "\nSHIELD: ");
-                        hexToDeci(fpr, fpw, 3);
+                        hexToDeci(fpr, fpw);
                 }
                 else if(c == 'F')
                 {
                         fprintf(fpw, "\nCANNON: ");
-                        hexToDeci(fpr, fpw, 3);
+                        hexToDeci(fpr, fpw);
                 }
                 else
                 {
