@@ -61,6 +61,29 @@ void hexToDeci(FILE* fpr, FILE* fpw, int n) // 16진수 > 10진수 변환
   fprintf(fpw, "%d", deci);
 }
 
+void friend(FILE* fpr, FILE* fpw)
+{
+        char c;
+        int i = 1;
+        fprintf(fpw, "\n*FRIENDS LIST*");
+        while((c=fgetc(fpr))!='\n')
+        {
+                        fprintf(fpw, "\nFRIEND%d ID: ", i);
+                        print(fpr, fpw);
+                        fprintf(fpw, "\nFRINED%d NAME: ", i);
+                        print(fpr, fpw);
+                        fprintf(fpw, "\nFRIEND%d GENDER: ", i);
+                        print(fpr, fpw);
+                        fprintf(fpw, "\nFRINED%d AGE: ", i);
+                        while((c=fgetc(fpr))!='|' )c=fgetc(fpr))!='\n')
+			{
+				fprintf(fpw, "%c", c);
+			}
+		fprintf(fpw, "\n\n");
+                i++;
+        }
+}
+
 
 void user(FILE *fpr, FILE *fpw)
 {
@@ -237,8 +260,8 @@ int main(int argc, char* argv[])
 
 	user(fpr, fpw);
 /*
-  items();
-	friend();*/
+  items();*/
+	friend(fpr, fpw);
 	description(fpr,fpw);
 
 	fclose(fpr);
