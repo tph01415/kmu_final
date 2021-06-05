@@ -230,7 +230,7 @@ void trans(FILE * fp1, FILE * fp2)
             fprintf(fp2, "\n");
         } else {
             while (!feof(fp1)) {
-                fgets(buf, MAX_BUF_SIZE, fp1);          
+                if (fgets(buf,MAX_BUF_SIZE,fp1) == NULL) break;          
                 bufptr = strtok(buf, "\n");
                 bufptr = getrle(bufptr,rle);
                 fprintf(fp2, "%s\n", bufptr);
