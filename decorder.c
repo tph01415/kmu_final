@@ -245,12 +245,66 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 	fprintf(fpw,"\n*DESCRIPTION*\n");
 	char tmp;
 	char c;
+	char str[10];
 	int a;
+	int check_str = 0; // 문자열 체크변수 (1 = 시작, 2 = 끝, 0 = 문자열 구간X)
+	int n=0; // 문자열 위치 가리키는 변수
 	int check=0;                          //문자인지 숫자인지 체크
 	while((tmp = fgetc(fpr)) != EOF)     //끝까지 1글자씩 읽어옴
 	{
-		if(tmp >= 'A' && tmp <= 'Z')  //영문자일때
+		if(check_str == 1) // 문자열 구간 시작 > 문자열 값 저장 
 		{
+			if(tmp >= 'A' && tmp <='Z')
+			{
+				if(check == TEXT_TYPE)
+				{
+					str[n] = c;
+					n++;
+				}
+				else if(check == NUM_TYPE)
+				{
+					for(i=n; i<n+a; i++)
+						str[i] = c;
+					n=n+i;
+				}
+				c = tmp;
+				check = TEXT_TYPE;
+			}
+			else if(tmp>='0' && tmp <='9')
+			{
+				if(check == TEXT_TYPE)
+				{
+					a = tmp-'0';
+				}
+				if(check == NUM_TYPE)
+				{
+					a=a*10;
+					a+=tmp-'0';
+				}
+				check = NUM_TYPE;
+			}
+			else if(tmp == '"') // " 쌍따옴표 한 번 더 나와서 문자열이 끝나는 지점
+			{
+				check_str == 2;
+				str[n] = '\0';
+			}
+		}
+		else if(check_str == 2) // 문자열이 끝나고 다음 나오는 숫자에 따른 문자열 반복
+		{
+			a=tmp-'0';
+			for(i=0; i<a; i++)
+			{
+				fprintf(fpw, "%s", str);
+			}
+			check_str = 0;  // 각 값들 초기화
+			check = 0;
+			n=0;
+			str = '\0';
+		}
+		else if(check_str == 0) // 문자열 구간이 아닐때
+		{
+		  if(tmp >= 'A' && tmp <= 'Z')  //영문자일때
+		  {
 			if(check == TEXT_TYPE)  //이전 문자가 텍스트이면
 			{
 				fputc(c,fpw);   //이전문자 출력
@@ -262,9 +316,9 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 			}
 			c = tmp;    //읽은문자 c에 저장
 			check = TEXT_TYPE;   //체크타입 변경
-		}
-		else if( tmp>='0' && tmp <='9')    //숫자일때
-		{
+		  }
+		  else if( tmp>='0' && tmp <='9')    //숫자일때
+		  {
 			if(check == TEXT_TYPE)  //이전문자 텍스트
 			{
 				a = tmp-'0';  //읽은 숫자 a에 저장
@@ -275,9 +329,14 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 				a+= tmp-'0';
 			}
 			check = NUM_TYPE;  //체크타입 변경
-		}
-		else if(tmp == '\n')  //줄바뀜
-		{
+		  }
+		  else if(tmp == '"') // 문자열 일 때
+		  {
+			check_str = 1; //  문자열 check 변수 1로 변경 -> 다음 "가 나올때까지 배열로 입력받음
+			check = 0; // check 타입 초기화
+		  }
+		  else if(tmp == '\n')  //줄바뀜
+		  {
 			if(check == TEXT_TYPE)
 				fputc(c,fpw);
 			else if(check == NUM_TYPE)
@@ -287,9 +346,9 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 			}
 			fputc(tmp,fpw);
 			check = 0;
-		}
-		else              //특수문자(숫자텍스트)
-		{
+		  }
+		  else              //특수문자(숫자텍스트)
+		  {
 			if(check == TEXT_TYPE)
 			{
 				fputc(c,fpw);
@@ -313,6 +372,7 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 				case ')': c='0'; break;
 			}
 			check = TEXT_TYPE;
+		   }
 		}
 	}
 }
