@@ -265,7 +265,7 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 				{
 					for(i=n; i<n+a; i++)
 						str[i] = c;
-					n=n+i;
+					n=i;
 				}
 				c = tmp;
 				check = TEXT_TYPE;
@@ -285,6 +285,17 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 			}
 			else if(tmp == '"') // " 쌍따옴표 한 번 더 나와서 문자열이 끝나는 지점
 			{
+				if(check == TEXT_TYPE)
+				{
+					str[n] = c;
+					n++;
+				}
+				else if(check == NUM_TYPE)
+				{
+					for(i=n; i<n+a; i++)
+						str[i] = c;
+					n=i;
+				}
 				check_str == 2;
 				str[n] = '\0';
 			}
