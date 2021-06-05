@@ -299,6 +299,34 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 				check_str == 2;
 				str[n] = '\0';
 			}
+			else              //특수문자(숫자텍스트)
+			{
+			  if(check == TEXT_TYPE)
+			  {
+				str[n] = c;
+				n++;
+			  }
+			  else if(check == NUM_TYPE)
+			  {
+				for(i = n;i<n+a; i++)
+					str[i] = c;
+				n = i;
+			  }
+			  switch(tmp)
+			  {
+				case '!': c='1'; break;
+				case '@': c='2'; break;
+				case '#': c='3'; break;
+				case '$': c='4'; break;
+				case '%': c='5'; break;
+				case '^': c='6'; break;
+				case '&': c='7'; break;
+				case '*': c='8'; break;
+				case '(': c='9'; break;
+				case ')': c='0'; break;
+			  }
+			  check = TEXT_TYPE;
+		   }
 		}
 		else if(check_str == 2) // 문자열이 끝나고 다음 나오는 숫자에 따른 문자열 반복
 		{
