@@ -22,7 +22,7 @@ int main()
     Error_Loc  Detected_Errors[4] = {{0,0,0}}; //초기화 최대 에러는 4개까지
     int NoOfError= 0;
 
-    input_fptr = fopen("input.txt","rb");
+    input_fptr = fopen("data.txt","rb");
     if(input_fptr ==NULL) return 1;
 
     for (NoRow = 0 ; (rCount = fread(input_data[NoRow], sizeof(char), SIZE_OF_ROW, input_fptr)) != 0 ; NoRow++) {
@@ -93,14 +93,14 @@ int main()
     printf("\n");
     */
 
-    printf("Before: %u (%d,%d)\n", input_data[4][3], 4, 3);
-    input_data[4][3]= 'X' ;
-    printf("After : %u (%d,%d)\n", input_data[4][3], 4, 3);
+    printf("Before: %u (%d,%d)\n", input_data[2][8], 2, 8);
+    input_data[2][8]= 'X' ;
+    printf("After : %u (%d,%d)\n", input_data[2][8], 2, 8);
 
 
-    printf("Before: %u (%d,%d)\n", input_data[2][9], 2, 9);
-    input_data[2][9]= 'Z' ;
-    printf("After : %u (%d,%d)\n", input_data[2][9], 2, 9);
+    printf("Before: %u (%d,%d)\n", input_data[3][9], 3, 9);
+    input_data[3][9]= 'Z' ;
+    printf("After : %u (%d,%d)\n", input_data[3][9], 3, 9);
 
     printf("\n");
 
@@ -172,6 +172,14 @@ int main()
             printf("%u ",input_data[NoRow][j]);
     printf("\n");
     */
+
+	for( i = 0; i<NoOfError; i++){
+		input_data[Detected_Errors[i].row][Detected_Errors[i].col] =  input_data[Detected_Errors[i].row][Detected_Errors[i].col] - (Detected_Errors[i].diff);
+		
+		printf("\n Error collection has made !!!  %u(%d,%d)", input_data[Detected_Errors[i].row][Detected_Errors[i].col],
+															  Detected_Errors[i].row,
+															  Detected_Errors[i].col);
+	}
 
     fclose(input_fptr);
 

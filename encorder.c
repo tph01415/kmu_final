@@ -3,47 +3,20 @@
 #include <string.h>
 #include <ctype.h>
 
-/*----------------
-
-
-
-
-----------------*/
-
-
 #define TRUE 1
 #define FALSE 0
 #define MAX_ID_SIZE 255
 #define MAX_NAME_SIZE 255
 #define MAX_BUF_SIZE 512
 
-void trans(FILE * fp1, FILE * fp2);
+//체크섬 배열
+#define SIZE_OF_ROW 50 //row크기
+#define SIZE_OF_COL 100 //col크기
 
 int debug = 1;
 int check = 0;
 char hexstr[255];
 char desc_str[MAX_BUF_SIZE];
-
-int main(int argc, char * argv[])
-{
-    FILE * readfp, * writefp;
-    // readfp로 argv[1]으로부터 받아온 파일을 읽기 모드로 fopen
-    if (!(readfp = fopen(argv[1], "r"))) {
-        fprintf(stderr, "Cannot open %s file.\n", argv[1]);
-        exit(EXIT_FAILURE);
-    }
-    // writefp로 argv[2]로부터 받아온 파일을 쓰기 모드로 fopen
-    if (!(writefp = fopen(argv[2], "w"))) {
-        fprintf(stderr, "Cannot open %s file.\n", argv[2]);
-        exit(EXIT_FAILURE);
-    }
-    trans(readfp, writefp); 
-
-    fclose(readfp);
-    fclose(writefp);
-    
-    return 0;
-}
 
 
 char * change_hex(char * str){
@@ -106,8 +79,20 @@ char * change_desc(char * str){
     return desc_str;
 }
 
-void trans(FILE * fp1, FILE * fp2)
+void trans(char file1[], char file2[])
 {
+    FILE * fp1, * fp2;
+    // readfp로 argv[1]으로부터 받아온 파일을 읽기 모드로 fopen
+    if (!(fp1 = fopen(file1, "r"))) {
+        fprintf(stderr, "Cannot open %s file.\n", file1);
+        exit(EXIT_FAILURE);
+    }
+    // writefp로 argv[2]로부터 받아온 파일을 쓰기 모드로 fopen
+    if (!(fp2 = fopen(file2, "w"))) {
+        fprintf(stderr, "Cannot open %s file.\n", file2);
+        exit(EXIT_FAILURE);
+    }
+
     int i, loop = TRUE;
     char buf[MAX_BUF_SIZE], tmp[MAX_BUF_SIZE];
     char * bufptr;
@@ -192,4 +177,84 @@ void trans(FILE * fp1, FILE * fp2)
             loop = FALSE;
         } 
     }
+
+	fclose(fp1);
+	fclose(fp2);
 }
+
+
+void CheckSumInsert(char file1[], char file2[]){
+    FILE * input_fptr;
+    // writefp로 argv[2]로부터 받아온 파일을 쓰기 모드로 fopen
+    if (!(input_fptr = fopen(file2, "r+"))) {
+        fprintf(stderr, "Cannot open %s file.\n", file2);
+        exit(EXIT_FAILURE);
+    }
+
+	char input_data[SIZE_OF_COL+2][SIZE_OF_ROW+2] = {0}; //checksum 데이터가 들어가는 2차원 배열
+    char buf[MAX_BUF_SIZE];
+	int rCount; //카운터
+    int NoRow;//number of row
+    int i,j;
+    unsigned short  int RowCS, xRowCS; //...checksum 값을 빼내서 비교하는 배열
+    unsigned short  int ColCS[SIZE_OF_ROW+2] = {0}; //배열 초기화(전체 배열의 크기는 checksum값이 들어가는 칸(+2)
+    unsigned short  int xColCS[SIZE_OF_ROW+2] = {0}; // 동일
+    int NoOfError= 0;
+
+
+	if(input_fptr ==NULL) exit(1);
+    for (NoRow = 0 ; (rCount = fread(input_data[NoRow], sizeof(char), SIZE_OF_ROW, input_fptr)) != 0 ; NoRow++) {
+            input_data[NoRow][rCount] = '\0';
+			//데이터를 2차원 배열에 넣고 체크섬 값이 들어갈 부분에는 NULL\0값을 넣어준다.
+			printf("[%d,%d]\n%s\n",NoRow, rCount,input_data[NoRow]);
+    }
+
+    for( j = 0 ; j <= SIZE_OF_ROW+1 ; j++ )
+            ColCS[j] = 0;
+
+    for( i = 0 ; i < NoRow ; i++ ) {
+            input_data[i][SIZE_OF_ROW] = 0 ;
+            input_data[i][SIZE_OF_ROW+1] = 0 ;
+            RowCS =0;
+            for( j = 0 ; j < SIZE_OF_ROW ; j++ ) {
+                    RowCS += (unsigned short) input_data[i][j];
+                    ColCS[j] += (unsigned short) input_data[i][j];
+
+					//각 칸 마다 마지막 row와 col에+=해서 아스키 값을 더해주면서 입력한다
+            }
+            input_data[i][SIZE_OF_ROW] = (unsigned char)(0xFF & RowCS);
+            input_data[i][SIZE_OF_ROW+1] = (unsigned char)(0xFF & (RowCS >> 8));
+			
+			//값을 1바이트 1바이트로 나눠서 0xFF 0xFF 저장(오버플로우 방지)
+
+	}
+
+    for( i = 0 ; i < NoRow ; i++ ) {
+            for(j = SIZE_OF_ROW; j <= SIZE_OF_ROW+1  ; j++ ) {
+                    ColCS[j] != (unsigned short) input_data[i][j];
+            }
+    }
+
+    for( j = 0 ; j <= SIZE_OF_ROW+1 ; j++ ) {
+            input_data[NoRow][j] = (unsigned char) (0xFF & ColCS[j]);
+            input_data[NoRow+1][j] = (unsigned char) (0xFF & (ColCS[j] >> 8));
+    }
+	
+	for(int i=0; i < NoRow; i++){
+	 	for(int j = 0; j <= SIZE_OF_ROW+1; j++){
+                fprintf(input_fptr, "%d", input_data[i][j]);
+		}
+	}
+
+	fclose(input_fptr);
+}
+
+
+int main(int argc, char * argv[])
+{
+    trans(argv[1], argv[2]); 
+	CheckSumInsert(argv[2], argv[2]);
+	
+    return 0;
+}
+
