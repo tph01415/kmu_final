@@ -292,11 +292,7 @@ void CheckSumInsert(char file[]){
 	
 	fseek(input_fptr,0,SEEK_SET);
 
-	for(int i=0; i < NoRow; i++){
-	 	for(int j = 0; j <= SIZE_OF_ROW+1; j++){
-                fprintf(input_fptr, "%d", input_data[i][j]);
-		}
-	}
+    fwrite(&input_data[0][0],sizeof(char),sizeof(input_data),input_fptr);
 
 	fclose(input_fptr);
 }
