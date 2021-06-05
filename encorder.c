@@ -18,65 +18,105 @@ int check = 0;
 char hexstr[255];
 char desc_str[MAX_BUF_SIZE];
 
+int checkItem(char * str)
+{
+    if (strcmp(str, "BOMB") == 0) return 1;
+    else if (strcmp(str, "POTION") == 0) return 2;
+    else if (strcmp(str, "CURE") == 0) return 3;
+    else if (strcmp(str, "BOOK") == 0) return 4;
+    else if (strcmp(str, "SHIELD") == 0) return 5;
+    return 6;
+}
 
 char * change_hex(char * str){
     int value = atoi(str);
     
     sprintf(hexstr,"%x",value);
 	
-	check =0;
+	check = 0;
 	return hexstr;
 }
 
+int getrepeat(char *str, char *lcs, int count)
+{
+    char *ptr = str;
+    int repeat = 0;
+    if (strlen(str) < count)
+        return 0;
+    while (strncmp(ptr,lcs,count) == 0)
+    {
+        ptr += count;
+        repeat++;    
+    }
+    return repeat;        
+}
 
-char * change_desc(char * str){
-    char buffer[MAX_BUF_SIZE];
-    int i=0, j=0,k=0;
-    int count=1;
-    int index=0;
-
-    for(i=0; i<MAX_BUF_SIZE; i++)desc_str[i] ='\0';
-
-    for(i=0; i<strlen(str); i++){
-        if(str[i] == 0)
-            break;
-
-
-        for(j=i; j<strlen(str); j++){
-            if(str[j] == str[j+1])
-                count++;
+char *runlengthencoding(char *str, char *rle, int count)
+{
+    char *ptr = str;
+    char *ptrend = &str[strlen(str)];
+    char lcs[100];
+    char encoding[100];
+    int repeat;
+    strcpy(rle,"");
+    
+    if (count == 0)
+    {
+        int len = strlen(str);
+        for (int i = 0; i < len; i++)
+        {
+            if (isdigit(str[i]))
+                rle[i] = str[i]-10;
             else
-                break;
+                rle[i] = str[i];
         }
+        
+        rle[len] = '\0';
 
-        if(count == 1){
-            desc_str[index]=str[i];
-            index++;
-        }
-        else{
-            if(isdigit(str[i]) != 0){  
-                desc_str[index] = str[i] - 10;
-            } else{
-                desc_str[index]=str[i];
-            }
-            sprintf(buffer,"%d",count);
-            while(buffer[k]!=0){
-                desc_str[index+1+k]=buffer[k];
-                k++;
-            }   
-            index=index+1;
-            for(k=k;k>0;k--){
-                index=index+1;
-                }
-            k=0;
-        }               
-
-        i = i+count-1;
-        count =1;
-
+        return rle;
     }
 
-    return desc_str;
+    while (ptr < ptrend)
+    {
+        strncpy(lcs, ptr, count);
+        lcs[count] = '\0';
+        repeat = getrepeat(ptr, lcs, count);
+        if (repeat > 1)
+        {
+            if (count > 1)
+            {
+                sprintf(encoding, "\"%s\"%d", lcs, repeat);
+            }
+	    else
+            {
+                sprintf(encoding, "%s%d", lcs,repeat);
+            }
+            strcat(rle, encoding);
+            ptr = ptr + count * repeat;
+            }
+	else
+        {
+            sprintf(encoding, "%c", *ptr);
+            strcat(rle, encoding);
+            ptr++;
+        }
+    }
+    
+    return rle;    
+}
+
+char *getrle(char str[], char rle[])
+{
+    char strlcs[100];
+    
+	strcpy(strlcs, str);
+    for (int count = 0; count <= 4; count++)
+    {
+        runlengthencoding(strlcs, rle, count);
+        strcpy(strlcs, rle);
+    }
+
+    return rle;
 }
 
 void trans(char file1[], char file2[])
@@ -93,9 +133,9 @@ void trans(char file1[], char file2[])
         exit(EXIT_FAILURE);
     }
 
-    int i, loop = TRUE;
-    char buf[MAX_BUF_SIZE], tmp[MAX_BUF_SIZE];
-    char * bufptr;
+   int i, loop = TRUE;
+    char buf[MAX_BUF_SIZE], tmp[MAX_BUF_SIZE], rle[MAX_BUF_SIZE];
+    char * bufptr, * itemStr;
     while (loop) {
         if (strcmp(buf, "*DESCRIPTION*") != 0) {
             fgets(buf, MAX_BUF_SIZE, fp1);           
@@ -130,16 +170,26 @@ void trans(char file1[], char file2[])
             buf[strlen(buf) - 1] = '\0';
             while (1) {
                 bufptr = strtok(buf, ":");
+                itemStr = bufptr;
                 bufptr = strtok(NULL, "\n");
                 for (i = 0 ; i < strlen(bufptr) ; i ++) bufptr[i] = bufptr[i + 1];
                 fgets(tmp, MAX_BUF_SIZE, fp1);
                 if (tmp[0] != '\n') tmp[strlen(tmp) - 1] = '\0';
                 if (tmp[0] == '\n') {
-                    fprintf(fp2, "%s\n", change_hex(bufptr));
+                    if (checkItem(itemStr) == 1) fprintf(fp2, "A%s\n", change_hex(bufptr));
+                    else if (checkItem(itemStr) == 2) fprintf(fp2, "B%s\n", change_hex(bufptr));
+                    else if (checkItem(itemStr) == 3) fprintf(fp2, "C%s\n", change_hex(bufptr));
+                    else if (checkItem(itemStr) == 4) fprintf(fp2, "D%s\n", change_hex(bufptr));
+                    else if (checkItem(itemStr) == 5) fprintf(fp2, "E%s\n", change_hex(bufptr));
+                    else if (checkItem(itemStr) == 6) fprintf(fp2, "F%s\n", change_hex(bufptr));
                     break;
                 } else {
-					check = 1;
-                    fprintf(fp2, "%s/", change_hex(bufptr));
+                    if (checkItem(itemStr) == 1) fprintf(fp2, "A%s/", change_hex(bufptr));
+                    else if (checkItem(itemStr) == 2) fprintf(fp2, "B%s/", change_hex(bufptr));
+                    else if (checkItem(itemStr) == 3) fprintf(fp2, "C%s/", change_hex(bufptr));
+                    else if (checkItem(itemStr) == 4) fprintf(fp2, "D%s/", change_hex(bufptr));
+                    else if (checkItem(itemStr) == 5) fprintf(fp2, "E%s/", change_hex(bufptr));
+                    else if (checkItem(itemStr) == 6) fprintf(fp2, "F%s/", change_hex(bufptr));
                     strcpy(buf, tmp);
                 }
             }
@@ -168,16 +218,16 @@ void trans(char file1[], char file2[])
             fprintf(fp2, "\n");
         } else {
             while (!feof(fp1)) {
-                fgets(buf, MAX_BUF_SIZE, fp1);          
+                if (fgets(buf,MAX_BUF_SIZE,fp1) == NULL) break;          
                 bufptr = strtok(buf, "\n");
-                bufptr = change_desc(bufptr);
+                bufptr = getrle(bufptr,rle);
                 fprintf(fp2, "%s\n", bufptr);
             }
 
             loop = FALSE;
         } 
     }
-
+    
 	fclose(fp1);
 	fclose(fp2);
 }
@@ -206,7 +256,7 @@ void CheckSumInsert(char file[]){
     for (NoRow = 0 ; (rCount = fread(input_data[NoRow], sizeof(char), SIZE_OF_ROW, input_fptr)) != 0 ; NoRow++) {
             input_data[NoRow][rCount] = '\0';
 			//데이터를 2차원 배열에 넣고 체크섬 값이 들어갈 부분에는 NULL\0값을 넣어준다.
-			printf("[%d,%d]\n%s\n",NoRow, rCount,input_data[NoRow]);
+			//printf("[%d,%d]\n%s\n",NoRow, rCount,input_data[NoRow]);
     }
 
     for( j = 0 ; j <= SIZE_OF_ROW+1 ; j++ )
