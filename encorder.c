@@ -183,11 +183,11 @@ void trans(char file1[], char file2[])
 }
 
 
-void CheckSumInsert(char file1[], char file2[]){
+void CheckSumInsert(char file[]){
     FILE * input_fptr;
     // writefp로 argv[2]로부터 받아온 파일을 쓰기 모드로 fopen
-    if (!(input_fptr = fopen(file2, "r+"))) {
-        fprintf(stderr, "Cannot open %s file.\n", file2);
+    if (!(input_fptr = fopen(file, "r+"))) {
+        fprintf(stderr, "Cannot open %s file.\n", file);
         exit(EXIT_FAILURE);
     }
 
@@ -240,6 +240,8 @@ void CheckSumInsert(char file1[], char file2[]){
             input_data[NoRow+1][j] = (unsigned char) (0xFF & (ColCS[j] >> 8));
     }
 	
+	fseek(input_fptr,0,SEEK_SET);
+
 	for(int i=0; i < NoRow; i++){
 	 	for(int j = 0; j <= SIZE_OF_ROW+1; j++){
                 fprintf(input_fptr, "%d", input_data[i][j]);
@@ -253,7 +255,7 @@ void CheckSumInsert(char file1[], char file2[]){
 int main(int argc, char * argv[])
 {
     trans(argv[1], argv[2]); 
-	CheckSumInsert(argv[2], argv[2]);
+	CheckSumInsert(argv[2]);
 	
     return 0;
 }
