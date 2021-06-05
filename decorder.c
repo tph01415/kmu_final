@@ -5,6 +5,7 @@
 
 #define TEXT_TYPE 1  //소개글 글자타입
 #define NUM_TYPE 2
+
 char eofItem = 0;
 #define SIZE_ROW 50
 #define SIZE_COL 100
