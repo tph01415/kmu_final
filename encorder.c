@@ -256,7 +256,7 @@ void CheckSumInsert(char file[]){
     for (NoRow = 0 ; (rCount = fread(input_data[NoRow], sizeof(char), SIZE_OF_ROW, input_fptr)) != 0 ; NoRow++) {
             input_data[NoRow][rCount] = '\0';
 			//데이터를 2차원 배열에 넣고 체크섬 값이 들어갈 부분에는 NULL\0값을 넣어준다.
-			//printf("[%d,%d]\n%s\n",NoRow, rCount,input_data[NoRow]);
+			printf("[%d,%d]\n%s\n",NoRow, rCount,input_data[NoRow]);
     }
 
     for( j = 0 ; j <= SIZE_OF_ROW+1 ; j++ )
@@ -292,7 +292,7 @@ void CheckSumInsert(char file[]){
 	
 	fseek(input_fptr,0,SEEK_SET);
 
-    fwrite(&input_data[0][0],sizeof(char),sizeof(input_data),input_fptr);
+    fwrite(&input_data[0][0],sizeof(char),sizeof(char)*(NoRow*SIZE_OF_ROW),input_fptr);
 
 	fclose(input_fptr);
 }
