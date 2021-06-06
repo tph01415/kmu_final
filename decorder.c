@@ -243,9 +243,10 @@ void items(FILE* fpr, FILE* fpw)
 FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 {
 	fprintf(fpw,"\n*DESCRIPTION*\n");
+	int i;
 	char tmp;
 	char c;
-	char str[10];
+	char str[10]={0};
 	int a;
 	int check_str = 0; // 문자열 체크변수 (1 = 시작, 2 = 끝, 0 = 문자열 구간X)
 	int n=0; // 문자열 위치 가리키는 변수
@@ -296,7 +297,7 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 						str[i] = c;
 					n=i;
 				}
-				check_str == 2;
+				check_str = 2;
 				str[n] = '\0';
 			}
 			else              //특수문자(숫자텍스트)
@@ -338,7 +339,7 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 			check_str = 0;  // 각 값들 초기화
 			check = 0;
 			n=0;
-			str = '\0';
+			str[0] = '\0';
 		}
 		else if(check_str == 0) // 문자열 구간이 아닐때
 		{
@@ -371,6 +372,15 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 		  }
 		  else if(tmp == '"') // 문자열 일 때
 		  {
+				if(check == TEXT_TYPE)
+				{
+					fputc(c,fpw);
+				}
+				else if(check == NUM_TYPE)
+				{
+					for(i=0;i<a;i++)
+						fputc(c,fpw);
+				}
 			check_str = 1; //  문자열 check 변수 1로 변경 -> 다음 "가 나올때까지 배열로 입력받음
 			check = 0; // check 타입 초기화
 		  }
@@ -426,14 +436,14 @@ int main(int argc, char* argv[])
 	FILE* fpr = fopen(argv[1],"r+");  //인코딩 후 데이터 파일
 	FILE* fpw = fopen(argv[2],"w+");  //디코딩 후 데이터 파일
 
-	fpr = check(fpr);
+//	fpr = check(fpr);
 
 	user(fpr, fpw);
   items(fpr,fpw);
 	friend(fpr, fpw);
 	description(fpr,fpw);
 
-	remove("temp.txt");
+//	remove("temp.txt");
 	fclose(fpr);
 	fclose(fpw);
 	return 0;
