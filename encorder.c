@@ -256,7 +256,7 @@ void CheckSumInsert(char file[]){
     for (NoRow = 0 ; (rCount = fread(input_data[NoRow], sizeof(char), SIZE_OF_ROW, input_fptr)) != 0 ; NoRow++) {
             input_data[NoRow][rCount] = '\0';
 			//데이터를 2차원 배열에 넣고 체크섬 값이 들어갈 부분에는 NULL\0값을 넣어준다.
-			printf("[%d,%d]\n%s\n",NoRow, rCount,input_data[NoRow]);
+			//printf("[%d,%d]\n%s\n",NoRow, rCount,input_data[NoRow]);
     }
 
     for( j = 0 ; j <= SIZE_OF_ROW+1 ; j++ )
@@ -269,30 +269,32 @@ void CheckSumInsert(char file[]){
             for( j = 0 ; j < SIZE_OF_ROW ; j++ ) {
                     RowCS += (unsigned short) input_data[i][j];
                     ColCS[j] += (unsigned short) input_data[i][j];
-
 					//각 칸 마다 마지막 row와 col에+=해서 아스키 값을 더해주면서 입력한다
-            }
+			
+			}
+
             input_data[i][SIZE_OF_ROW] = (unsigned char)(0xFF & RowCS);
             input_data[i][SIZE_OF_ROW+1] = (unsigned char)(0xFF & (RowCS >> 8));
+			//printf("\nRow = %d, CS = %x,(%x,%x)", i, RowCS, (unsigned char)input_data[i][SIZE_OF_ROW], (unsigned char)input_data[i][SIZE_OF_ROW+1]);
 			
 			//값을 1바이트 1바이트로 나눠서 0xFF 0xFF 저장(오버플로우 방지)
 
 	}
-
-    for( i = 0 ; i < NoRow ; i++ ) {
-            for(j = SIZE_OF_ROW; j <= SIZE_OF_ROW+1  ; j++ ) {
-                    ColCS[j] != (unsigned short) input_data[i][j];
-            }
-    }
-
+	
+	for(i = 0; i < NoRow ; i++ ) {
+		for(j=SIZE_OF_ROW ; j < SIZE_OF_ROW+2; j++){
+			ColCS[j] += (unsigned short) input_data[i][j];
+		}
+	}
     for( j = 0 ; j <= SIZE_OF_ROW+1 ; j++ ) {
             input_data[NoRow][j] = (unsigned char) (0xFF & ColCS[j]);
             input_data[NoRow+1][j] = (unsigned char) (0xFF & (ColCS[j] >> 8));
-    }
-	
+			//printf("\n Column = %d, RC = %u", j, ColCS[j]);
+	}
+
 	fseek(input_fptr,0,SEEK_SET);
 
-    fwrite(&input_data[0][0],sizeof(char),sizeof(char)*(NoRow*SIZE_OF_ROW),input_fptr);
+    fwrite(&input_data[0][0],sizeof(char),sizeof(char)*(NoRow+2)*(SIZE_OF_ROW+2),input_fptr);
 
 	fclose(input_fptr);
 }
