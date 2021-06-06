@@ -26,7 +26,7 @@ FILE* check(FILE* fpr)
 	}Error_Loc;
 	Error_Loc detected_error[4] = {{0,0,0}};
 
-	while((rCount = fread(input_data[noRow],sizeof(char),SIZE_ROW+2,fpr))>1) /////////NULL 1
+	while((rCount = fread(input_data[noRow],sizeof(char),SIZE_ROW+2,fpr))>10) /////////NULL 1
 		noRow++;
 
 	for(j=0;j<SIZE_ROW;j++)
@@ -52,7 +52,7 @@ FILE* check(FILE* fpr)
 			numError++;
 		}
 	}
-
+ printf("복구전");
 	for(j=0;j<SIZE_ROW;j++){
 		if(xColCS[j] != colCS[j]){
 			for(i=j;i<numError;i++){
@@ -68,14 +68,18 @@ FILE* check(FILE* fpr)
 			}
 		}
 	}
-
-	for(i=0;i<SIZE_ROW;i++)
+printf("템프 출력전 ");
+	for(i=0;i<noRow-2;i++)
 	{
-		for(j=0;j<noRow-2;j++)
+		for(j=0;j<SIZE_ROW;j++){
+			if(input_data[i][j] == '\0')
+				break;
 			fprintf(tempFp,"%c",input_data[i][j]);
+		}
 	}
 	fclose(tempFp);
 	fpr = fopen("temp.txt","r+");
+	printf("템프 출력후 ");
 	return fpr;
 }
 
@@ -133,7 +137,7 @@ void friend(FILE* fpr, FILE* fpw)
 	{
 		fprintf(fpw, "\nFRIEND%d ID: ", i);
 		print(fpr, fpw);
-		fprintf(fpw, "\nFRINED%d NAME: ", i);
+		fprintf(fpw, "\nFRIEND%d NAME: ", i);
 		print(fpr, fpw);
 		fprintf(fpw, "\nFRIEND%d GENDER: ", i);
 		while((c = fgetc(fpr)) != '/'){
@@ -142,7 +146,7 @@ void friend(FILE* fpr, FILE* fpw)
 			else fprintf(fpw, "MALE"); // F가 아닐 경우도 설정
 		}
 		//                       print(fpr, fpw);
-		fprintf(fpw, "\nFRINED%d AGE: ", i);
+		fprintf(fpw, "\nFRIEND%d AGE: ", i);
 		while(1)
 		{
 			c=fgetc(fpr);
@@ -315,16 +319,16 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 				}
 				switch(tmp)
 				{
-					case '!': c='1'; break;
-					case '@': c='2'; break;
-					case '#': c='3'; break;
-					case '$': c='4'; break;
-					case '%': c='5'; break;
-					case '^': c='6'; break;
-					case '&': c='7'; break;
-					case '*': c='8'; break;
-					case '(': c='9'; break;
-					case ')': c='0'; break;
+					case 38: c='0'; break;
+					case 39: c='1'; break;
+					case 40: c='2'; break;
+					case 41: c='3'; break;
+					case 42: c='4'; break;
+					case 43: c='5'; break;
+					case 44: c='6'; break;
+					case 45: c='7'; break;
+					case 46: c='8'; break;
+					case 47: c='9'; break;
 				}
 				check = TEXT_TYPE;
 			}
@@ -429,16 +433,16 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 				}
 				switch(tmp)
 				{
-					case '!': c='1'; break;
-					case '@': c='2'; break;
-					case '#': c='3'; break;
-					case '$': c='4'; break;
-					case '%': c='5'; break;
-					case '^': c='6'; break;
-					case '&': c='7'; break;
-					case '*': c='8'; break;
-					case '(': c='9'; break;
-					case ')': c='0'; break;
+					case 38: c='0'; break;
+					case 39: c='1'; break;
+					case 40: c='2'; break;
+					case 41: c='3'; break;
+					case 42: c='4'; break;
+					case 43: c='5'; break;
+					case 44: c='6'; break;
+					case 45: c='7'; break;
+					case 46: c='8'; break;
+					case 47: c='9'; break;
 				}
 				check = TEXT_TYPE;
 			}
@@ -456,14 +460,14 @@ int main(int argc, char* argv[])
 	FILE* fpr = fopen(argv[1],"r+");  //인코딩 후 데이터 파일
 	FILE* fpw = fopen(argv[2],"w+");  //디코딩 후 데이터 파일
 
-	//	fpr = check(fpr);
-
+		fpr = check(fpr);
+printf("체크끝");
 	user(fpr, fpw);
 	items(fpr,fpw);
 	friend(fpr, fpw);
 	description(fpr,fpw);
 
-	//	remove("temp.txt");
+		remove("temp.txt");
 	fclose(fpr);
 	fclose(fpw);
 	return 0;
