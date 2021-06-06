@@ -7,7 +7,7 @@
 #define NUM_TYPE 2
 #define STRNUM_TYPE 3
 char eofItem = 0;
-#define SIZE_ROW 50
+#define SIZE_ROW 12
 #define SIZE_COL 100
 
 FILE* check(FILE* fpr)
@@ -52,7 +52,6 @@ FILE* check(FILE* fpr)
 			numError++;
 		}
 	}
- printf("복구전");
 	for(j=0;j<SIZE_ROW;j++){
 		if(xColCS[j] != colCS[j]){
 			for(i=0;i<numError;i++){
@@ -61,14 +60,19 @@ FILE* check(FILE* fpr)
 					break;
 				}
 			}
-			if(i==numError)
-				printf("복구 불가 변조위치\n");
-			else{
+			if(i==numError){
+				//printf("error correction fail\n");
+			}else{
+				int pos = (SIZE_ROW+2)*detected_error[i].row+detected_error[i].col;
+				printf("%int error correction(%d) %u ->",i,
+															pos,
+															input_data[detected_error[i].row][detected_error[i].col]
+															);
 				input_data[detected_error[i].row][detected_error[i].col] += detected_error[i].diff;
+				printf("%u\n",input_data[detected_error[i].row][detected_error[i].col]);
 			}
 		}
 	}
-printf("템프 출력전 ");
 	for(i=0;i<noRow-2;i++)
 	{
 		for(j=0;j<SIZE_ROW;j++){
@@ -79,7 +83,6 @@ printf("템프 출력전 ");
 	}
 	fclose(tempFp);
 	fpr = fopen("temp.txt","r+");
-	printf("템프 출력후 ");
 	return fpr;
 }
 

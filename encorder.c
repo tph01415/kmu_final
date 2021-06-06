@@ -10,7 +10,7 @@
 #define MAX_BUF_SIZE 512
 
 //체크섬 배열
-#define SIZE_OF_ROW 50 //row크기
+#define SIZE_OF_ROW 12 //row크기
 #define SIZE_OF_COL 100 //col크기
 
 int debug = 1;
@@ -289,7 +289,8 @@ void CheckSumInsert(char file[]){
     for( j = 0 ; j <= SIZE_OF_ROW+1 ; j++ ) {
             input_data[NoRow][j] = (unsigned char) (0xFF & ColCS[j]);
             input_data[NoRow+1][j] = (unsigned char) (0xFF & (ColCS[j] >> 8));
-			//printf("\n Column = %d, RC = %u", j, ColCS[j]);
+			printf("\n Column = %d, RC = %u", j, ColCS[j]);
+			
 	}
 
 	fseek(input_fptr,0,SEEK_SET);
