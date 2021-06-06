@@ -5,7 +5,7 @@
 
 #define TEXT_TYPE 1  //소개글 글자타입
 #define NUM_TYPE 2
-
+#define STRNUM_TYPE 3
 char eofItem = 0;
 #define SIZE_ROW 50
 #define SIZE_COL 100
@@ -81,9 +81,9 @@ FILE* check(FILE* fpr)
 
 
 void print(FILE* fpr, FILE *fpw){ // user 함수 조금이라도 깨끗하게 보이기 위해 설정
-  int c;
-  while((c = fgetc(fpr)) != '/')
-    fprintf(fpw, "%c", c);
+	int c;
+	while((c = fgetc(fpr)) != '/')
+		fprintf(fpw, "%c", c);
 }
 
 void hexToDeci(FILE* fpr, FILE* fpw) // 16진수 > 10진수 변환
@@ -159,34 +159,34 @@ void friend(FILE* fpr, FILE* fpw)
 
 void user(FILE *fpr, FILE *fpw)
 {
-  int c, n;
-  fprintf(fpw, "*USER STATUS*\n");
+	int c, n;
+	fprintf(fpw, "*USER STATUS*\n");
 
-  fprintf(fpw, "ID: ");
-  print(fpr, fpw);  // 단순 입력은 print 사용
-  
-  fprintf(fpw, "\nNAME: "); 
-  print(fpr, fpw);
+	fprintf(fpw, "ID: ");
+	print(fpr, fpw);  // 단순 입력은 print 사용
 
-  fprintf(fpw, "\nGENDER: ");
-  while((c = fgetc(fpr)) != '/'){
-    if(c == 'F') 
-      fprintf(fpw, "FEMALE");
-    else fprintf(fpw, "MALE"); // F가 아닐 경우도 설정
-  }
+	fprintf(fpw, "\nNAME: "); 
+	print(fpr, fpw);
 
-  fprintf(fpw, "\nAGE: ");
-  print(fpr, fpw);
+	fprintf(fpw, "\nGENDER: ");
+	while((c = fgetc(fpr)) != '/'){
+		if(c == 'F') 
+			fprintf(fpw, "FEMALE");
+		else fprintf(fpw, "MALE"); // F가 아닐 경우도 설정
+	}
 
-  char same[] = {'/'};
-  fprintf(fpw, "\nHP: ");
-  hexToDeci(fpr, fpw);
-  
-  fprintf(fpw, "\nMP: ");
-  hexToDeci(fpr, fpw);
+	fprintf(fpw, "\nAGE: ");
+	print(fpr, fpw);
 
-  fprintf(fpw, "\nCOIN: ");
-  hexToDeci(fpr, fpw);
+	char same[] = {'/'};
+	fprintf(fpw, "\nHP: ");
+	hexToDeci(fpr, fpw);
+
+	fprintf(fpw, "\nMP: ");
+	hexToDeci(fpr, fpw);
+
+	fprintf(fpw, "\nCOIN: ");
+	hexToDeci(fpr, fpw);
 
 }
 
@@ -302,76 +302,78 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 			}
 			else              //특수문자(숫자텍스트)
 			{
-			  if(check == TEXT_TYPE)
-			  {
-				str[n] = c;
-				n++;
-			  }
-			  else if(check == NUM_TYPE)
-			  {
-				for(i = n;i<n+a; i++)
-					str[i] = c;
-				n = i;
-			  }
-			  switch(tmp)
-			  {
-				case '!': c='1'; break;
-				case '@': c='2'; break;
-				case '#': c='3'; break;
-				case '$': c='4'; break;
-				case '%': c='5'; break;
-				case '^': c='6'; break;
-				case '&': c='7'; break;
-				case '*': c='8'; break;
-				case '(': c='9'; break;
-				case ')': c='0'; break;
-			  }
-			  check = TEXT_TYPE;
-		   }
+				if(check == TEXT_TYPE)
+				{
+					str[n] = c;
+					n++;
+				}
+				else if(check == NUM_TYPE)
+				{
+					for(i = n;i<n+a; i++)
+						str[i] = c;
+					n = i;
+				}
+				switch(tmp)
+				{
+					case '!': c='1'; break;
+					case '@': c='2'; break;
+					case '#': c='3'; break;
+					case '$': c='4'; break;
+					case '%': c='5'; break;
+					case '^': c='6'; break;
+					case '&': c='7'; break;
+					case '*': c='8'; break;
+					case '(': c='9'; break;
+					case ')': c='0'; break;
+				}
+				check = TEXT_TYPE;
+			}
 		}
 		else if(check_str == 2) // 문자열이 끝나고 다음 나오는 숫자에 따른 문자열 반복
 		{
 			a=tmp-'0';
-			for(i=0; i<a; i++)
-			{
-				fprintf(fpw, "%s", str);
-			}
 			check_str = 0;  // 각 값들 초기화
-			check = 0;
+			check = STRNUM_TYPE;
 			n=0;
-			str[0] = '\0';
 		}
 		else if(check_str == 0) // 문자열 구간이 아닐때
 		{
-		  if(tmp >= 'A' && tmp <= 'Z')  //영문자일때
-		  {
-			if(check == TEXT_TYPE)  //이전 문자가 텍스트이면
+			if(tmp >= 'A' && tmp <= 'Z')  //영문자일때
 			{
-				fputc(c,fpw);   //이전문자 출력
+				if(check == TEXT_TYPE)  //이전 문자가 텍스트이면
+				{
+					fputc(c,fpw);   //이전문자 출력
+				}
+				else if(check == NUM_TYPE) // 이전문자 숫자이면
+				{
+					for(int i = 0;i<a;i++)   //숫자만큼 반복출력
+						fputc(c,fpw);
+				}
+				else if(check == STRNUM_TYPE)
+				{
+					for(i=0;i<a;i++)
+						fprintf(fpw,"%s",str);
+					str[0] = '\0';
+				}
+				c = tmp;    //읽은문자 c에 저장
+				check = TEXT_TYPE;   //체크타입 변경
 			}
-			else if(check == NUM_TYPE) // 이전문자 숫자이면
+			else if( tmp>='0' && tmp <='9')    //숫자일때
 			{
-				for(int i = 0;i<a;i++)   //숫자만큼 반복출력
-					fputc(c,fpw);
+				if(check == TEXT_TYPE)  //이전문자 텍스트
+				{
+					a = tmp-'0';  //읽은 숫자 a에 저장
+				}
+				if(check == NUM_TYPE || check == STRNUM_TYPE) //이전문자 숫자일때
+				{
+					a=a*10;        //두자리수 이상의 경우임
+					a+= tmp-'0';
+				}
+				if(check != STRNUM_TYPE)
+					check = NUM_TYPE;  //체크타입 변경
 			}
-			c = tmp;    //읽은문자 c에 저장
-			check = TEXT_TYPE;   //체크타입 변경
-		  }
-		  else if( tmp>='0' && tmp <='9')    //숫자일때
-		  {
-			if(check == TEXT_TYPE)  //이전문자 텍스트
+			else if(tmp == '"') // 문자열 일 때
 			{
-				a = tmp-'0';  //읽은 숫자 a에 저장
-			}
-			if(check == NUM_TYPE) //이전문자 숫자일때
-			{
-				a=a*10;        //두자리수 이상의 경우임
-				a+= tmp-'0';
-			}
-			check = NUM_TYPE;  //체크타입 변경
-		  }
-		  else if(tmp == '"') // 문자열 일 때
-		  {
 				if(check == TEXT_TYPE)
 				{
 					fputc(c,fpw);
@@ -381,47 +383,65 @@ FILE* description(FILE* fpr,FILE* fpw) //소개글 디코딩
 					for(i=0;i<a;i++)
 						fputc(c,fpw);
 				}
-			check_str = 1; //  문자열 check 변수 1로 변경 -> 다음 "가 나올때까지 배열로 입력받음
-			check = 0; // check 타입 초기화
-		  }
-		  else if(tmp == '\n')  //줄바뀜
-		  {
-			if(check == TEXT_TYPE)
-				fputc(c,fpw);
-			else if(check == NUM_TYPE)
+				else if(check == STRNUM_TYPE)
+				{
+					for(i=0;i<a;i++)
+						fprintf(fpw,"%s",str);
+					str[0] = '\0';
+				}
+				check_str = 1; //  문자열 check 변수 1로 변경 -> 다음 "가 나올때까지 배열로 입력받음
+				check = 0; // check 타입 초기화
+			}
+			else if(tmp == '\n')  //줄바뀜
 			{
-				for(int i = 0;i<a;i++)
+				if(check == TEXT_TYPE)
 					fputc(c,fpw);
+				else if(check == NUM_TYPE)
+				{
+					for(int i = 0;i<a;i++)
+						fputc(c,fpw);
+				}
+				else if(check == STRNUM_TYPE)
+				{
+					for(i=0;i<a;i++)
+						fprintf(fpw,"%s",str);
+					str[0] = '\0';
+				}
+				fputc(tmp,fpw);
+				check = 0;
 			}
-			fputc(tmp,fpw);
-			check = 0;
-		  }
-		  else              //특수문자(숫자텍스트)
-		  {
-			if(check == TEXT_TYPE)
+			else              //특수문자(숫자텍스트)
 			{
-				fputc(c,fpw);
-			}
-			else if(check == NUM_TYPE)
-			{
-				for(int i = 0;i<a;i++)
+				if(check == TEXT_TYPE)
+				{
 					fputc(c,fpw);
+				}
+				else if(check == NUM_TYPE)
+				{
+					for(int i = 0;i<a;i++)
+						fputc(c,fpw);
+				}
+				else if(check == STRNUM_TYPE)
+				{
+					for(i=0;i<a;i++)
+						fprintf(fpw,"%s",str);
+					str[0] = '\0';
+				}
+				switch(tmp)
+				{
+					case '!': c='1'; break;
+					case '@': c='2'; break;
+					case '#': c='3'; break;
+					case '$': c='4'; break;
+					case '%': c='5'; break;
+					case '^': c='6'; break;
+					case '&': c='7'; break;
+					case '*': c='8'; break;
+					case '(': c='9'; break;
+					case ')': c='0'; break;
+				}
+				check = TEXT_TYPE;
 			}
-			switch(tmp)
-			{
-				case '!': c='1'; break;
-				case '@': c='2'; break;
-				case '#': c='3'; break;
-				case '$': c='4'; break;
-				case '%': c='5'; break;
-				case '^': c='6'; break;
-				case '&': c='7'; break;
-				case '*': c='8'; break;
-				case '(': c='9'; break;
-				case ')': c='0'; break;
-			}
-			check = TEXT_TYPE;
-		   }
 		}
 	}
 }
@@ -436,14 +456,14 @@ int main(int argc, char* argv[])
 	FILE* fpr = fopen(argv[1],"r+");  //인코딩 후 데이터 파일
 	FILE* fpw = fopen(argv[2],"w+");  //디코딩 후 데이터 파일
 
-//	fpr = check(fpr);
+	//	fpr = check(fpr);
 
 	user(fpr, fpw);
-  items(fpr,fpw);
+	items(fpr,fpw);
 	friend(fpr, fpw);
 	description(fpr,fpw);
 
-//	remove("temp.txt");
+	//	remove("temp.txt");
 	fclose(fpr);
 	fclose(fpw);
 	return 0;
