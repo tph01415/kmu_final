@@ -135,28 +135,28 @@ void friend(FILE* fpr, FILE* fpw)
 	fprintf(fpw, "\n\n*FRIENDS LIST*");
 	while(1)
 	{
-		fprintf(fpw, "\nFRIEND%d ID: ", i);
+		fprintf(fpw, "\nFRIEND%d ID: ", i); // FRIEND i 의 ID 출력부분
 		print(fpr, fpw);
-		fprintf(fpw, "\nFRIEND%d NAME: ", i);
+		fprintf(fpw, "\nFRIEND%d NAME: ", i); // FRIEND i 의 NAME 출력부분
 		print(fpr, fpw);
-		fprintf(fpw, "\nFRIEND%d GENDER: ", i);
+		fprintf(fpw, "\nFRIEND%d GENDER: ", i); // // FRIEND i 의 GENDER 출력부분
 		while((c = fgetc(fpr)) != '/'){
 			if(c == 'F') 
 				fprintf(fpw, "FEMALE");
 			else fprintf(fpw, "MALE"); // F가 아닐 경우도 설정
 		}
 		//                       print(fpr, fpw);
-		fprintf(fpw, "\nFRIEND%d AGE: ", i);
+		fprintf(fpw, "\nFRIEND%d AGE: ", i); // FRIEND i 의 AGE 출력부분
 		while(1)
 		{
 			c=fgetc(fpr);
-			if(c=='|' || c=='\n')
+			if(c=='|' || c=='\n') // | 또는 \n일 경우 반복문 중단 후 줄넘기기
 				break;
 			fprintf(fpw, "%c", c);
 		}
 		fprintf(fpw, "\n");
 		i++;
-		if(c=='\n')
+		if(c=='\n') // \n일 경우 전체 반복문 중단
 			break;
 	}
 }
